@@ -13,17 +13,18 @@ class Game:
         
         correctly_guessed = []
         wrongly_guessed = []
-        guesses = [self.play_one(algo_name, secret_word) for secret_word in self.words]
+        self.algo_name = algo_name
+        guesses = Parallel(n_jobs=NUM_CPUS)(delayed(self.play_one)(secret_word) for secret_word in self.words)
         correctly_guessed = [a for a,b in zip(self.words,guesses) if b]
         wrongly_guessed = [a for a,b in zip(self.words,guesses) if not b]
-        accuracy = 100*len(correctly_guessed)/len(self.words)
+        accuracy = 100*len(correctly_guessed)/(len(guesses))
         
         return accuracy, correctly_guessed, wrongly_guessed
 
     
-    def play_one(self, algo_name, secret_word):
+    def play_one(self, secret_word):
         
-        A = algo_name(self.filename)
+        A = self.algo_name(self.filename)
             
         for i in range(6):
 
